@@ -59,6 +59,7 @@ include_once('sair.php');
                         </div>
                         <p> Contato </p>
                         <input type="text" class="input-cadastro-artista" id="contato-artista" required>
+                        <button type="submit" class="botao-enviar cadastro"> Enviar </button>
                     </div>
                 </form>
                 <a href="?sair">Sair</a>
@@ -93,6 +94,7 @@ include_once('sair.php');
         document.querySelector("#files").addEventListener("change", (e) => { //CHANGE EVENT FOR UPLOADING PHOTOS
             if (window.File && window.FileReader && window.FileList && window.Blob) { //CHECK IF FILE API IS SUPPORTED
                 const files = e.target.files; //FILE LIST OBJECT CONTAINING UPLOADED FILES
+                
                 const output = document.querySelector("#result");
                 output.innerHTML = "";
                 for (let i = 0; i < files.length; i++) { // LOOP THROUGH THE FILE LIST OBJECT
