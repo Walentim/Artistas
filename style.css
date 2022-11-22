@@ -41,12 +41,13 @@
     text-align:left;
 }
 
-h3{
+.texto-index{
     margin: 0;
     margin-top: 2vmax;
 }
 
-p{
+.texto-form{
+    
     margin: 0;
     margin-top: 2vmax;
 
@@ -57,6 +58,129 @@ p{
 ########################################### ESTILIZAÇÃO CADASTRO ###################################################
 ####################################################################################################################
 */
+
+/* estilização body do cadastro */
+.cadastro-artista {
+    width: 100%; 
+    height: 100%;
+    margin: 0 auto;
+    background-image: url( img/bg_main.png) ;
+    background-position: fixed;
+    background-repeat: no-repeat;
+    justify-content: flex-start;
+}
+
+/* texto 'Crie e Compartilhe com o RockXaba' */
+
+.texto-artista{
+
+    font-size: 4vmax;
+    color: white;
+    opacity: 70%;
+    font-family: 'Josefin Sans', sans-serif;
+    text-align: justify;
+    width: 45%;
+    font-weight: 100;
+
+
+
+}
+
+.conteudo{
+
+    margin-left: 5vmax;
+    margin-top: 5vmax;
+    
+}
+
+/* formulário de cadastro do Artista */
+
+.cadastro-artista-form{
+
+    display: flex;
+    flex-direction: row;
+
+
+}
+
+/* texto em cima dos campos do cadastro do Artista */
+
+.cadastro-artista-form p{
+
+    color: white;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 1.5vmax;
+
+}
+
+/* parte do formulário de cadastro do Artista que fica na direita da página */
+.form-p2{
+
+    margin-left: 4vmax;
+}
+
+/* ============================================= seletor de cores ============================================= */
+
+.card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 30px 30px -15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 1vmax;
+}
+
+.lista-seletor-cores {
+    list-style: none;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 20px;
+}
+
+.lista-seletor-cores li {
+    width: 24px;
+    height: 24px;    
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.lista-seletor-cores li:hover {
+    transform: scale(1.1);
+}
+
+#red {
+    background-color: #ef5350;
+}
+#green {
+    background-color: #66bb6a;
+}
+#amber {
+    background-color: #ffca28;
+}
+#blue {
+    background-color: #42a5f5;
+}
+#gray {
+    background-color: #bdbdbd;
+}
+
+/* Upload das 5 fotos */
+
+#result{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 0;
+  }
+  
+  .thumbnail {
+    height: 192px;
+  }
 
 
 /*

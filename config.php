@@ -9,7 +9,13 @@
 
     /* Variável de conexão */
 
-    $connect = pg_connect("host=$servername dbname=$db_name user=$username password=$password") or die ("Não foi possível conectar ao servidor PostGreSQL");
     
-    
+    try {
+        $dsn = "pgsql:host=$servername;port=5432;dbname=$db_name;";
+        // make a database connection
+        $pdo = new PDO($dsn, $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+
+    } catch(PDOException $e){
+        die("ERROR: Não foi possível conectar." . $e->getMessage());
+    }
 ?>
