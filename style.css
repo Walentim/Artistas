@@ -88,8 +88,9 @@
 
 .conteudo{
 
-    margin-left: 5vmax;
+    margin-left: 4vmax;
     margin-top: 5vmax;
+   
     
 }
 
@@ -119,69 +120,19 @@
     margin-left: 4vmax;
 }
 
+.erro{
+
+    font-size: 15px !important;
+    color: red !important;
+}
+
 /* ============================================= seletor de cores ============================================= */
 
-.card {
-    background-color: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 30px 30px -15px rgba(0, 0, 0, 0.3);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 1vmax;
-}
+label{
 
-.lista-seletor-cores {
-    list-style: none;
-    padding: 24px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-gap: 20px;
+    color: white;
+    font-family: 'Josefin Sans', sans-serif;
 }
-
-.lista-seletor-cores li {
-    width: 24px;
-    height: 24px;    
-    border-radius: 50%;
-    cursor: pointer;
-    transition: transform 0.3s;
-}
-
-.lista-seletor-cores li:hover {
-    transform: scale(1.1);
-}
-
-#red {
-    background-color: #ef5350;
-}
-#green {
-    background-color: #66bb6a;
-}
-#amber {
-    background-color: #ffca28;
-}
-#blue {
-    background-color: #42a5f5;
-}
-#gray {
-    background-color: #bdbdbd;
-}
-
-/* Upload das 5 fotos */
-
-#result{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px 0;
-  }
-  
-  .thumbnail {
-    height: 192px;
-  }
-
 
 /*
 ####################################################################################################################
