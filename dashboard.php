@@ -167,6 +167,8 @@ $contando = count($array);
         <a href="?sair">Sair</a>
     </div>
     </div>
+    <!-- JavaScript do multi-seletor de gêneros-->
+    <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag/dist/js/multi-select-tag.js"></script>
     <!-- Importa o arquivo script.js, que contém o JavaScript interno do site -->
     <script src="js/script.js"></script>
 </body>

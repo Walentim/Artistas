@@ -263,7 +263,7 @@ else{
                     $photo_tmp_name = $_FILES["logo-name"]["tmp_name"];
                     $photo_size = $_FILES["logo-name"]["size"];
                     $photo_new_name_logo = rand() . $photo_name;
-                    move_uploaded_file($photo_tmp_name, "uploads/" . $photo_new_name_logo);
+                    move_uploaded_file($photo_tmp_name, "../uploads/" . $photo_new_name_logo);
 
                     /* consulta para a logo */
 
@@ -284,7 +284,7 @@ else{
                         $photo_tmp_name = $_FILES["fotos"]["tmp_name"][$i];
                         $photo_size = $_FILES["fotos"]["size"][$i];
                         $photo_new_name = rand() . $photo_name;
-                        move_uploaded_file($photo_tmp_name, "uploads/" . $photo_new_name);
+                        move_uploaded_file($photo_tmp_name, "../uploads/" . $photo_new_name);
 
                         $sql = "INSERT INTO foto_evento(photo_evento, fk_evento_id_evento, front_page) VALUES ('$photo_new_name', $FK_id_evento, 'page')";
                         $stmt = $pdo->prepare($sql);
