@@ -6,10 +6,10 @@
 
 <?php
 
-// Verifique se o usuário já está logado, em caso afirmativo, redirecione-o para a página de boas-vindas
+// Verifique se o usuário já está logado, em caso afirmativo, redirecione-o para a página de cadastro
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    header("location: cadastro.php");
-    exit;
+
+    session_destroy();
 }
 
 if (isset($_GET['acao'])) {
@@ -68,6 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $id = $row["id_user"];
                         $username = $row["nome_user"];
                         $hashed_password = $row["senha_user"];
+
                         if (password_verify($password, $hashed_password)) {
                             // A senha está correta, então inicie uma nova sessão
                             session_start();
@@ -77,8 +78,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $_SESSION["id"] = $id;
                             $_SESSION["username"] = $username;
 
-                            // Redirecionar o usuário para a página de boas-vindas
-                            header("location: cadastro.php");
+                            $sql = "SELECT fk_situacao_id_sit FROM artista WHERE fk_usuario_id_user = '$id'";
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute();
+                            $row = $stmt->fetch();
+
+                            /* ================ LISTA DE SITUAÇÕES ================ 
+
+                                1 - Ativo
+                                2 - Inativo
+                                3 - Aguardando Confirmação
+                                4 - Recadastro 
+
+                               ===================================================== */
+
+                            /* Se a pessoa já está cadastrada */
+                            if ($stmt->rowCount() == 1) {
+
+                                /* Aguardando confirmação */
+                                if ($row['fk_situacao_id_sit'] == 3) {
+
+                                    header('Location: muito_obrigado.php');
+                                }
+                                /* Recadastro autorizado */ 
+                                else if ($row['fk_situacao_id_sit'] == 4) {
+
+                                    header('Location: cadastro.php');
+                                }
+
+                                /* Se a pessoa já é uma Artista ativo no RockXaba */ 
+                                else if ($row['fk_situacao_id_sit'] == 1) {
+
+                                    header('Location: dashboard.php');
+                                }
+                            } else {
+                                
+                               
+                                header('Location: cadastro.php');
+                                
+                            }
                         } else {
                             // A senha não é válida, exibe uma mensagem de erro genérica
                             $login_err = "Nome de usuário ou senha inválidos.";

@@ -16,6 +16,7 @@
         $pdo = new PDO($dsn, $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 
     } catch(PDOException $e){
+        
         die("ERROR: Não foi possível conectar." . $e->getMessage());
     }
 ?>

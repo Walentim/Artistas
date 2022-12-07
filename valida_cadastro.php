@@ -10,30 +10,6 @@
 session_start();
 ob_clean();
 
-if (isset($_SESSION["loggedin"])) {
-
-    //Dados
-    $id = $_SESSION['id'];
-    $sql = "SELECT id_user from usuario where id_user = '$id'";
-    $sql2 = "SELECT id_artista from artista where FK_USUARIO_id_user = $id";
-    $stmt = $pdo->prepare($sql);
-    $stmt2 = $pdo->prepare($sql2);
-    $stmt->execute();
-    $stmt2->execute();
-
-    if ($stmt->rowCount() < 1) {
-
-        header("location: index.php");
-        exit;
-    } else if ($stmt2->rowCount() > 0) {
-
-        echo 'Você já é um artista!';
-        /*
-    header("location: index.php");
-     exit;
-    */
-    }
-}
 
 // Defina variáveis e inicialize com valores vazios
 $nome_artista = $dsc_artista  = $logo_name = $row_fotos[] = $nome_insta = $link_spotify = $cor_artista = $contato = $generos[] = "";
@@ -134,7 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $generos_erro = "Você precisa selecionar, no mínimo, um gênero musical, e no máximo, 10 gêneros!";
         }
-    } else if ($_POST["generos"] == NULL) {
+    } else if (@$_POST["generos"] == NULL) {
 
         $generos_erro = "Selecione pelo menos um gênero musical!";
     }
@@ -148,7 +124,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($_FILES["logo-name"] != NULL && count($_FILES["logo-name"]) > 0) {
 
             $logo_name = $_FILES['logo-name']['name'];
-            
         } else {
 
             $logo_erro = "Por favor, insira sua logo!";
@@ -171,7 +146,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
 
                 $row_fotos = $myFile;
-                
             }
         } else {
 
@@ -194,6 +168,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $nome_insta = $_POST['nome-insta'];
         }
     }
+
+    /* Verifica se é o primeiro cadastro do usuário */
 
     /* ================================ INSERINDO OS DADOS NO BANCO ================================ */
 
@@ -260,25 +236,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $stmt = $pdo->prepare($sql);
                         $stmt->execute();
                     }
-                    
-                      /* inserindo a logo na pasta de uploads */
 
-                      $photo_name = $_FILES["logo-name"]["name"];
-                      $photo_tmp_name = $_FILES["logo-name"]["tmp_name"];
-                      $photo_size = $_FILES["logo-name"]["size"];
-                      $photo_new_name = rand() . $photo_name;
-                      move_uploaded_file($photo_tmp_name, "uploads/" . $photo_new_name);
+                    /* inserindo a logo na pasta de uploads */
+
+                    $photo_name = $_FILES["logo-name"]["name"];
+                    $photo_tmp_name = $_FILES["logo-name"]["tmp_name"];
+                    $photo_size = $_FILES["logo-name"]["size"];
+                    $photo_new_name_logo = rand() . $photo_name;
+                    move_uploaded_file($photo_tmp_name, "uploads/" . $photo_new_name_logo);
 
                     /* consulta para a logo */
 
-                    $sql = "INSERT INTO foto_artista(photo_artista, fk_artista_id_artista, logo_foto) VALUES ('$photo_new_name', $FK_id_artista, 'logo')";
+                    $sql = "INSERT INTO foto_artista(photo_artista, fk_artista_id_artista, logo_foto) VALUES ('$photo_new_name_logo', $FK_id_artista, 'logo')";
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute();
 
                     /* consulta para as fotos */
 
                     $fileCount = count($row_fotos["name"]);
-                    
 
                     /* inserindo as fotos na pasta de uploads */
 
@@ -290,11 +265,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $photo_new_name = rand() . $photo_name;
                         move_uploaded_file($photo_tmp_name, "uploads/" . $photo_new_name);
 
+                        $row_fotos_nome[$i] = $photo_new_name;
+
                         $sql = "INSERT INTO foto_artista(photo_artista, fk_artista_id_artista, logo_foto) VALUES ('$photo_new_name', $FK_id_artista, 'foto')";
                         $stmt = $pdo->prepare($sql);
                         $stmt->execute();
-
-                        
                     }
 
                     /* consulta para o nome de instagram */
@@ -311,6 +286,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $sql = "UPDATE artista set contato = '$contato' where id_artista = $FK_id_artista";
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute();
+
+                    /* enviando email para verificação da página */
+
+                    $sql = "SELECT nome_user, email_user from usuario where id_user = $id";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute();
+                    $row = $stmt->fetch();
+
+                    $emailEnvia = $row["email_user"];
+                    $apelidoEnvia = $row["nome_user"];
+                    $emailRecebe = 'rockxaba027@gmail.com';
+                    $apelidoRecebe = 'RockXaba';
+
+                    $fileCount = count($_POST['generos']);
+                    $separator = ', ';
+                    $generos_string = implode($separator, $_POST['generos']);
+
+                    $body = "<strong>Este email foi utilizado para a realização do cadastro como Artista no site RockXaba, </strong> 
+                    pertencendo ao seguinte usuário: <br>
+                    Nome: " . $row["nome_user"] . "<br>
+                    Email: " . $row["email_user"] . "<br>
+                    Informações inseridas no cadastro de Artista: <br>
+                    ID do Artista: " . $FK_id_artista . "<br>
+                    Data da realização do cadastro: " . $dat_add_artista . "<br>
+                    Nome do Artista: " . $nome_artista . "<br>
+                    Descrição do Artista: " . $dsc_artista . "<br>
+                    Link da Playlist: " . $link_spotify . "<br>
+                    Chave estrangeira referente ao usuário inserida no banco (conferir): " . $id . "<br>
+                    Cor da Página: " . $cor_artista . "<br>
+                    Gêneros Musicais: " . $generos_string . "<br>
+                    Nome do Instagram: " . $nome_insta;
+
+                    $assunto = 'Solicitando o cadastro do(a) Artista/Banda';
+
+                    include 'emails.php';
+
+                    header('Location: muito_obrigado.php');
                 } else {
 
                     echo 'Esse nome de artista/banda já existe!';

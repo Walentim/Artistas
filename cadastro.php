@@ -10,7 +10,71 @@ include_once('sair.php');
 
 // Incluir arquivo de configuração
 require_once "config.php";
-require('valida_cadastro.php');
+
+session_start();
+
+if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+
+    //Dados
+    $id = $_SESSION['id'];
+    $sql = "SELECT id_user from usuario where id_user = '$id'";
+    $sql2 = "SELECT id_artista from artista where FK_USUARIO_id_user = $id";
+    $sql3 = "SELECT email_user from usuario where id_user = $id";
+    $stmt = $pdo->prepare($sql);
+    $stmt2 = $pdo->prepare($sql2);
+    $stmt->execute();
+    $stmt2->execute();
+    $sqlA = "SELECT fk_situacao_id_sit FROM artista WHERE fk_usuario_id_user = '$id'";
+    $stmtA = $pdo->prepare($sqlA);
+    $stmtA->execute();
+    $row_verifica = $stmtA->fetch();
+
+    /* ================ LISTA DE SITUAÇÕES ================ 
+
+        1 - Ativo
+        2 - Inativo
+        3 - Aguardando Confirmação
+        4 - Recadastro 
+
+       ===================================================== */
+
+    /* Impedindo que usuários já cadastrados como artistas, sejam aqueles 
+    que estão aguardando a aprovação da página, ou aqueles que já tiveram 
+    suas páginas aprovadas, acessem o cadastro novamente.               */
+
+    if ($stmtA->rowCount() == 1) {
+
+        /* Aguardando confirmação */
+        if ($row_verifica['fk_situacao_id_sit'] == 3) {
+
+            header('Location: muito_obrigado.php');
+        }
+
+        /* Se a pessoa já é uma Artista ativa no RockXaba */ else if ($row_verifica['fk_situacao_id_sit'] == 1) {
+
+            header('Location: dashboard.php');
+        } else if ($row_verifica['fk_situacao_id_sit'] == 4) {
+
+            /* Se a situação do usuário é de recadastro, a página recadastro será chamada, e será responsável
+           não pela inserção dos dados no banco, mas pela alteração dos que já existem e não foram aprovados,
+           pelos dados novamente inseridos no formulário */
+
+            require('recadastro.php');
+        }
+    } else {
+
+        require('valida_cadastro.php');
+    }
+} else {
+
+    header("Location: index.php");
+}
+
+$sql = "SELECT dsc_genero FROM genero";
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$array = $stmt->fetchAll();
+$contando = count($array);
 
 
 ?>
@@ -28,22 +92,20 @@ require('valida_cadastro.php');
                 <form method="POST" id="formulario-cadastro" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="cadastro-artista-form" enctype="multipart/form-data">
                     <div class="form-p1">
                         <p> Insira seu nome de Artista ou Banda </p>
-                        <input type="text" class="input-cadastro-artista" id="nome-artista" name="nome-artista" <?php if (!empty($nome_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['nome-artista'])) { ?> value='<?php echo $_POST['nome-artista'] ?>'<?php } ?> required>
+                        <input type="text" class="input-cadastro-artista" id="nome-artista" name="nome-artista" <?php if (!empty($nome_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['nome-artista'])) { ?> value='<?php echo $_POST['nome-artista'] ?>' <?php } ?> required>
                         <div class="erro">
                             <p class="erro"><?php echo $nome_erro; ?></p>
                         </div>
                         <p> Faça uma descrição (máx 500 caracteres) </p>
-                        <input type="text" class="input-cadastro-artista" id="dsc-artista" name="dsc-artista" maxlength="500" minlength="20" <?php if (!empty($dsc_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['dsc-artista'])) { ?> value='<?php echo $_POST['dsc-artista'] ?>'<?php } ?> required>
+                        <input type="text" class="input-cadastro-artista" id="dsc-artista" name="dsc-artista" maxlength="500" minlength="20" <?php if (!empty($dsc_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['dsc-artista'])) { ?> value='<?php echo $_POST['dsc-artista'] ?>' <?php } ?> required>
                         <div class="erro">
                             <p class="erro"><?php echo $dsc_erro; ?></p>
                         </div>
                         <p> Conte em qual/quais gêneros você se encaixa musicalmente </p>
                         <select name="generos[]" id="generos" multiple>
-                            <option value="Rock"> Rock </option>
-                            <option value="Indie"> Indie</option>
-                            <option value="Metal"> Metal </option>
-                            <option value="Samba"> Samba </option>
-                            <option value="Bossa Nova"> Bossa Nova </option>
+                            <?php for ($i = 0; $i < $contando; $i++) { ?>
+                                <option value="<?php echo $array[$i]['dsc_genero'] ?>"><?php echo $array[$i]['dsc_genero'] ?></option>
+                            <?php } ?>
                         </select>
                         <div class="erro">
                             <p class="erro"><?php echo $generos_erro; ?></p>
@@ -61,18 +123,18 @@ require('valida_cadastro.php');
                     </div>
                     <div class="form-p2">
                         <p> Nome no Instagram (opcional) </p>
-                        <input type="text" class="input-cadastro-artista" id="nome-insta-artista" name="nome-insta" <?php if (!empty($nome_insta_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['nome-insta'])) { ?> value='<?php echo $_POST['nome-insta'] ?>'<?php } ?>>
+                        <input type="text" class="input-cadastro-artista" id="nome-insta-artista" name="nome-insta" <?php if (!empty($nome_insta_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['nome-insta'])) { ?> value='<?php echo $_POST['nome-insta'] ?>' <?php } ?>>
                         <div class="erro">
                             <p class="erro"><?php echo $nome_insta_erro; ?></p>
                         </div>
-                        <img class="gif-tutorial" src="">
+                        <img class="gif-tutorial" src="img/tutorial_1.gif" width="500px" height="300px">
                         <p> Assista o gif tutorial e cole aqui seu link do Spotify ou YouTube </p>
                         <input type="radio" id="spotify" name="link_musicas" onclick="chamaCampo()" value="Spotify">
                         <label for="spotify_link"> Usar embed do Spotify </label><br>
-                        <input type="text" class="input-cadastro-artista" id="link-spotify" name="link-spotify" style="display: none;" <?php if (!empty($link_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['link-spotify'])) { ?> value='<?php echo $_POST['link-spotify'] ?>'<?php } ?>>
+                        <input type="text" class="input-cadastro-artista" id="link-spotify" name="link-spotify" style="display: none;" <?php if (!empty($link_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['link-spotify'])) { ?> value='<?php echo $_POST['link-spotify'] ?>' <?php } ?>>
                         <input type="radio" id="youtube" name="link_musicas" onclick="chamaCampo()" value="YouTube">
                         <label for="youtube_link"> Usar embed YouTube</label><br>
-                        <input type="text" class="input-cadastro-artista" id="link-youtube" name="link-youtube" style="display: none;" <?php if (!empty($link_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['link-youtube'])) { ?> value='<?php echo $_POST['link-youtube'] ?>'<?php } ?>>
+                        <input type="text" class="input-cadastro-artista" id="link-youtube" name="link-youtube" style="display: none;" <?php if (!empty($link_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['link-youtube'])) { ?> value='<?php echo $_POST['link-youtube'] ?>' <?php } ?>>
                         <div class="erro">
                             <p class="erro"><?php echo $link_erro; ?></p>
                         </div>
@@ -91,13 +153,14 @@ require('valida_cadastro.php');
                             <p class="erro"><?php echo $cor_erro; ?></p>
                         </div>
                         <p> Contato (Email) </p>
-                        <input type="email" class="input-cadastro-artista" id="contato-artista" name="contato-artista" <?php if (!empty($contato_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['contato-artista'])) { ?> value='<?php echo $_POST['contato-artista'] ?>'<?php } ?> required>
+                        <input type="email" class="input-cadastro-artista" id="contato-artista" name="contato-artista" <?php if (!empty($contato_erro)) { ?> style='border: 2px solid red;' <?php } ?> <?php if (isset($_POST['contato-artista'])) { ?> value='<?php echo $_POST['contato-artista'] ?>' <?php } ?> required>
                         <div class="erro">
                             <p class="erro"><?php echo $contato_erro; ?></p>
                         </div>
-                        <button type="submit" id="enviar_btn" class="botao-enviar cadastro"> Enviar </button>
+                        <button type="submit" id="enviar_btn" class="botao-evento"> Enviar </button>
                     </div>
                 </form>
+
                 <a href="?sair">Sair</a>
     </div>
     <!-- JavaScript do multi-seletor de gêneros-->
