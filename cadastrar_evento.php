@@ -122,6 +122,11 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                 <div class="erro">
                     <p class="erro"><?php echo $logo_erro; ?></p>
                 </div>
+                <p> Escolha uma imagem de fundo do Evento </p>
+                <input type="file" class="input-imagem" id="input-logo-artista" name="fundo-name" required>
+                <div class="erro">
+                    <p class="erro"><?php echo $fundo_erro; ?></p>
+                </div>
                 <p> Escolha até 5 fotos para a página do Evento </p>
                 <input id="files" name="fotos[]" type="file" accept=".jpg, .jpeg, .png" multiple required>
                 <div class="erro">
@@ -129,8 +134,6 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
                 </div>
             </div>
             <div class="form-p2">
-
-                <img class="gif-tutorial" src="img/tutorial_1.gif" width="500px" height="300px">
                 <p> Assista o gif tutorial e cole aqui seu link do Google Maps </p>
                 <input type="text" class="input-cadastro-artista" id="link-spotify" name="link-google-maps" <?php if (!empty($link_erro)) { ?> style='border: 2px solid red;' value='<?php echo $_POST['link-google-maps'] ?>' <?php } ?>>
                 <div class="erro">

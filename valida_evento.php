@@ -35,8 +35,8 @@ FK_EVENTO_id_evento
 */
 
 // Defina variáveis e inicialize com valores vazios
-$nome_artista = $dsc_artista  = $logo_name = $row_fotos[] = $cor_artista = $data_evento = $dat_inicio_ingre = $dat_fim_ingre = $link_spotify = $preco_evento = $local_evento = $artistas_evento = "";
-$nome_erro = $dsc_erro  = $logo_erro = $row_fotos_erro = $cor_erro  = $data_evento_erro = $dat_inicio_ingre_erro = $dat_fim_ingre_erro = $link_erro = $preco_evento_erro = $local_evento_erro = $artistas_evento_erro = "";
+$nome_artista = $dsc_artista  = $logo_name = $row_fotos[] = $cor_artista = $data_evento = $dat_inicio_ingre = $dat_fim_ingre = $fundo_name = $link_spotify = $preco_evento = $local_evento = $artistas_evento = $fundo_erro ="";
+$nome_erro = $dsc_erro  = $logo_erro = $row_fotos_erro = $cor_erro  = $data_evento_erro = $dat_inicio_ingre_erro = $dat_fim_ingre_erro = $link_erro = $preco_evento_erro = $fundo_evento = $local_evento_erro = $artistas_evento_erro = "";
 
 // Processando dados do formulário quando o formulário é enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -148,6 +148,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+     //Verifica se o campo da logo do Artista/Banda está vazio
+     if (!isset($_FILES['fundo-name'])) {
+
+        $fundo_erro = "Por favor, insira uma foto de fundo para o Evento!";
+    } else {
+
+        if ($_FILES["fundo-name"] != NULL && count($_FILES["fundo-name"]) > 0) {
+
+            $fundo_name = $_FILES['fundo-name']['name'];
+        } else {
+
+            $fundo_erro = "Por favor, insira uma foto de fundo para o Evento!";
+        }
+    }
+
+
     // Count total files
 
     if (isset($_FILES['fotos'])) {
@@ -205,7 +221,7 @@ else{
     if (
         empty($nome_erro) && empty($dsc_erro) && empty($logo_erro) && empty($row_fotos_erro) &&
         empty($dat_fim_ingre_erro) &&   empty($dat_inicio_ingre_erro) && empty($link_erro) && empty($cor_erro) 
-        && empty($local_evento_erro) && empty($artistas_evento_erro) && empty($preco_evento_erro) && empty($data_evento_erro)
+        && empty($local_evento_erro) && empty($artistas_evento_erro) && empty($preco_evento_erro) && empty($data_evento_erro) && empty($fundo_erro)
     ) {
         //Verificando se não existe nenhum nome de Artista igual no banco de dados
         // Prepare uma declaração selecionada
@@ -268,6 +284,20 @@ else{
                     /* consulta para a logo */
 
                     $sql = "INSERT INTO foto_evento(photo_evento, fk_evento_id_evento, front_page) VALUES ('$photo_new_name_logo', $FK_id_evento, 'front')";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute();
+
+                    /* inserindo a logo na pasta de uploads */
+
+                    $photo_name = $_FILES["fundo-name"]["name"];
+                    $photo_tmp_name = $_FILES["fundo-name"]["tmp_name"];
+                    $photo_size = $_FILES["fundo-name"]["size"];
+                    $photo_new_name_logo = rand() . $photo_name;
+                    move_uploaded_file($photo_tmp_name, "../uploads/" . $photo_new_name_logo);
+
+                    /* consulta para a logo */
+
+                    $sql = "INSERT INTO foto_evento(photo_evento, fk_evento_id_evento, front_page) VALUES ('$photo_new_name_logo', $FK_id_evento, 'fundo')";
                     $stmt = $pdo->prepare($sql);
                     $stmt->execute();
 

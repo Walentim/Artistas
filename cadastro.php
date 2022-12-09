@@ -50,9 +50,12 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
             header('Location: muito_obrigado.php');
         }
 
-        /* Se a pessoa já é uma Artista ativa no RockXaba */ else if ($row_verifica['fk_situacao_id_sit'] == 1) {
+        /* Se a pessoa já é uma Artista ativa no RockXaba */ 
+        else if ($row_verifica['fk_situacao_id_sit'] == 1) {
 
+            
             header('Location: dashboard.php');
+            
         } else if ($row_verifica['fk_situacao_id_sit'] == 4) {
 
             /* Se a situação do usuário é de recadastro, a página recadastro será chamada, e será responsável
@@ -61,14 +64,21 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
 
             require('recadastro.php');
         }
-    } else {
+    } else { 
+      
 
         require('valida_cadastro.php');
+
+    
     }
+
 } else {
 
     header("Location: index.php");
+
 }
+
+
 
 $sql = "SELECT dsc_genero FROM genero";
 $stmt = $pdo->prepare($sql);
